@@ -27,10 +27,68 @@ Refer Algorithms and write code for the experiment.
 • Verify the generated waveform using Tabulation and Model Waveform
 
 ## PROGRAM
+```
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.signal import butter, filtfilt
 
+fs = 100000
+t = np.arange(0, 0.01, 1/fs)
+
+# Message & carrier frequencies
+fm = [100, 200, 300, 400]
+fc = [5000, 10000, 15000, 20000]
+
+# Message signals
+m = [0.5*np.sin(2*np.pi*f*t) for f in fm]
+
+# Modulated DSB-SC signals
+s = [m[i] * np.cos(2*np.pi*fc[i]*t) for i in range(4)]
+
+# FDM combined
+fdm = sum(s)
+
+# Low-pass filter
+def lpf(x, cutoff):
+    b,a = butter(5, cutoff/(fs/2), 'low')
+    return filtfilt(b,a,x)
+
+# Demodulation + LPF recovery
+rec = [ lpf(fdm * (2*np.cos(2*np.pi*fc[i]*t)), fm[i]*2) for i in range(4) ]
+
+# ----------------- PLOTTING -----------------
+plt.figure(figsize=(13,13))
+
+# FDM
+plt.subplot(8,1,1); plt.plot(t, fdm, 'k'); plt.title("FDM - Multiplexed Signal")
+
+# CH0
+plt.subplot(8,1,2); plt.plot(t, s[0], 'r'); plt.title("CH0 - Modulated Signal")
+plt.subplot(8,1,3); plt.plot(t, rec[0], 'r'); plt.title("CH0 - Recovered Signal")
+
+# CH1
+plt.subplot(8,1,4); plt.plot(t, s[1], 'g'); plt.title("CH1 - Modulated Signal")
+plt.subplot(8,1,5); plt.plot(t, rec[1], 'g'); plt.title("CH1 - Recovered Signal")
+
+# CH2
+plt.subplot(8,1,6); plt.plot(t, s[2], 'b'); plt.title("CH2 - Modulated Signal")
+plt.subplot(8,1,7); plt.plot(t, rec[2], 'b'); plt.title("CH2 - Recovered Signal")
+
+# CH3 (Recovered Only)
+plt.subplot(8,1,8); plt.plot(t, rec[3], 'm'); plt.title("CH3 - Recovered Signal")
+
+plt.tight_layout()
+plt.show()
+```
 
 ## TABULATION:
+![WhatsApp Image 2025-11-21 at 23 16 43](https://github.com/user-attachments/assets/cb582403-e437-4ed9-a046-cff0cc2f32c1)
+
 
 ## GRAPH:
+<img width="1289" height="1289" alt="image" src="https://github.com/user-attachments/assets/55ef2c9d-a331-443d-b571-fffb137e2a2e" />
 
 ## RESULT:
+Thus the Frequency division multiplexing is done experimentally and output is verified
+
+
